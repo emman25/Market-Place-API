@@ -1,0 +1,105 @@
+security:
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    encoders:
+        App\Entity\User:
+            algorithm: bcrypt
+
+    providers:
+        entity_provider:
+            entity:
+                class: App\Entity\User
+                property: username
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        login:
+            pattern:  ^/api/login
+            stateless: true
+            anonymous: true
+            json_login:
+                check_path: /api/login
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+        register:
+            pattern:  ^/api/register
+            stateless: true
+            anonymous: true
+        stores:
+            pattern: ^/api/stores
+            stateless: true
+            anonymous: true
+            methods: [POST, GET]
+        clients:
+            pattern: ^/api/clients
+            stateless: true
+            anonymous: true
+            methods: [POST]
+        cities:
+            pattern: ^/api/cities
+            stateless: true
+            anonymous: true
+            methods: [GET]
+        states:
+            pattern: ^/api/states
+            stateless: true
+            anonymous: true
+            methods: [GET]
+        countries:
+            pattern: ^/api/countries
+            stateless: true
+            anonymous: true
+            methods: [GET]
+        products:
+            pattern: ^/api/products
+            stateless: true
+            anonymous: true
+            methods: [GET]
+        storeareas:
+            pattern: ^/api/storeareas
+            stateless: true
+            anonymous: true
+            methods: [GET]
+        productareas:
+            pattern: ^/api/productareas
+            stateless: true
+            anonymous: true
+            methods: [GET]
+        api:
+            pattern:  ^/api
+            stateless: true
+            anonymous: false
+            provider: entity_provider
+            guard:
+                authenticators:
+                    - lexik_jwt_authentication.jwt_token_authenticator
+        refresh:
+            pattern: ^/api/login/refresh
+            stateless: true
+            anonymous: true
+
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#firewalls-authentication
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/clients, methods: [GET, PUT, DELETE], roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/clients, methods: [POST], roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/stores, methods: [GET, POST], roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/stores, methods: [PUT, DELETE], roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/cities, methods: [GET], roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/states, methods: [GET], roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/countries, methods: [GET], roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/products, methods: [GET], roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/storeareas, methods: [GET], roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/productareas, methods: [GET], roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/login/refresh, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+        # - { path: ^/admin, roles: ROLE_ADMIN }
+        # - { path: ^/profile, roles: ROLE_USER }
